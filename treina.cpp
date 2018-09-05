@@ -8,28 +8,7 @@ int main(int argc, char** argv) {
 	ARQCSV A(location + "/treino.csv");
 	ARQCSV V(location + "/teste.csv" );
 	ARQCSV Q(location + "/valida.csv");
-	// std::vector<vec_t> ax;
-	// std::vector<vec_t> ay;
-	// std::vector<vec_t> vx;
-	// std::vector<vec_t> vy;
-	// std::vector<vec_t> qx;
-	// std::vector<vec_t> qy;
-
-	// for(int i=0;i<=200;i++){
-	// 	converte(A.x[i],ax[i]);
-	// 	converte(A.y[i],ay[i]);
-	// }
-
-	// for(int i=0;i<=100;i++){
-	// 	converte(V.x[i],vx[i]);
-	// 	converte(V.y[i],vy[i]);
-	// }
-
-
-	// for(int i=0;i<=100;i++){
-	// 	converte(Q.x[i],qx[i]);
-	// 	converte(Q.y[i],qy[i]);
-	// }
+	// Teste
 
 
 
