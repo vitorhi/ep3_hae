@@ -59,6 +59,7 @@ ARQCSV::ARQCSV(string arqcsv) {
         
         // x[i] = f.clone();
         // y[i] = f2.clone();
+        
         converte(f,tiny_x[i]);
         converte(f2,tiny_y[i]);
         nome[i]=st;

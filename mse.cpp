@@ -1,62 +1,77 @@
-//treina.cpp - treina rede para distinguir elipses e retangulos
-//compila treina -c -t
+//testa.cpp
+//compila testa -c -t
+//Taxa de erro de validacao: 0%
+//Taxa de erro de teste: 0%
+//Tempo de execucao: 0,5 s
 #include "csv.h"
+
 int main(int argc, char** argv) {
+
+	Mat_<FLT> f1(32,32),f2(32,32);
+	vec_t out;
+	vec_t x;;
+	
+	double media_a=0;
+	double media_v=0;
+	double media_q=0;
+	x.resize(1);
+	// x.resize(1);
+	// y.resize(1);
+	// nome.resize(1);
+	// int rot = 1;
+
+	if(argc=!2){
+		cout<<"Argumentos incorretos\n"<< "Exemplo:  mse ../diretorio_com_imagens";
+	}
 	string location = argv[1];
-    //"C:\\Users\\marco\\Desktop\\Poli\\Materias\\SistEletronicosInteligentes2\\Hae\\Aula7\\Ex7_3\\images_reduced\\treino.csv"
-    //Exemplo a partir de um diretorio: "...\\subdiretorio\\treino.csv"
 	ARQCSV A(location + "/treino.csv");
 	ARQCSV V(location + "/teste.csv" );
 	ARQCSV Q(location + "/valida.csv");
-	// Teste
 
+	
+	x=A.tiny_x[0];
 
-
-	int n_train_epochs=300;
-	int n_minibatch=2;
 	network<sequential> net;
-	net << conv(8, 8, 2, 1, 40)
-	<< max_pool(7, 7, 40, 2) << relu()
-	// << conv(3, 3, 2, 40, 80)
-	// << max_pool(2, 2, 80, 2) << relu()
-	<< fc(3*3*40, 200) << relu()
-	<< fc(200, 100) << relu()
-	<< fc(100, 32*32);
+	net.load("treina.net");
+	cout << "<<<<< validacao <<<<<<\n"<<A.nome[0]; 
+	printf("\noi1\n");
+	out = net.predict(x);
+	printf("oi2\n");
 
-// aumentaTreino(ax,ay,32,32,1,false,true); //espelha, diagonais
-adam optimizer;
-optimizer.alpha = 5e-5;
-cout << "Learning rate=" << optimizer.alpha << endl;
-int sucesso_anterior=0;
-cout << "start training" << endl;
-progress_display disp(A.tiny_x.size());
-timer t;
-int epoch = 1;
-double omelhor=100.0;
-auto on_enumerate_epoch = [&]() {
-
-	cout << "Epoch " << epoch << "/" << n_train_epochs << " finished. "
-	<< t.elapsed() << "s elapsed. ";
-	++epoch;
-	auto loss = net.get_loss<mse>(V.tiny_x, V.tiny_y);
-	// result res = net.test(V.tiny_x, V.tiny_y);
-	cout << "Validacao: " << loss << "/" /*<< res.num_total*/ << endl;
-	if (loss>=sucesso_anterior && optimizer.alpha>5e-6) {
-		optimizer.alpha *= 0.80;
-		cout << "Learning rate=" << optimizer.alpha << endl;
+	int k=0;
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			f1[i][j]=out[k++];
+		}
+	}	
+	k=0;
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			f2[i][j]=A.tiny_y[0][k++];
+		}
 	}
-	sucesso_anterior=loss;
-	if (loss<=omelhor) {
-		omelhor=loss;
-		string nomearq = semDiret(string(argv[0]))+".net";
-		net.save(nomearq);
-		cout << "Gravado arquivo " << nomearq << endl;
-	}
-	disp.restart(A.tiny_x.size());
-	t.restart();
-};
-auto on_enumerate_minibatch = [&]() { disp += n_minibatch; };
-net.fit<mse>(optimizer, A.tiny_x, A.tiny_y, n_minibatch,n_train_epochs, on_enumerate_minibatch, on_enumerate_epoch);
+	normalize(f1,f1,1,-1,NORM_MINMAX);
+	normalize(f2,f2,1,-1,NORM_MINMAX);
 
-cout << "end training." << endl;
+	mostra(f1);
+	mostra(f2);
+	double sum = 0.0;
+	
+		for(int y = 0; y < 32*32; ++y){
+			double difference = (out[y] - x[y]);
+			sum = sum + difference*difference;
+		}
+	
+	media_a = sum /(32*32);
+	
+	// media_a = net.get_loss<mse>(out, A.tiny_y);
+	// media_a=media_a/A.n;
+	cout<<"Media de MSE de treino.csv: "<< media_a;
+	
+
 }
+

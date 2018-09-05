@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
   network<sequential> net;
   net.load("treina.net");
   cout << "<<<<< validacao <<<<<<\n"; 
-  y = net.predict(x);
+  y[0] = net.predict(x[0]);
   int k=0;
   for (int i = 0; i < 32; i++)
   {
