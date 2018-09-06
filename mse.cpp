@@ -5,21 +5,50 @@
 //Tempo de execucao: 0,5 s
 #include "csv.h"
 
+double calcula_mse(vec_t img1 , vec_t img2){
+	Mat_<FLT> f1(32,32),f2(32,32);
+	int k=0;
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			f1[i][j]=img1[k++];
+		}
+	}	
+	k=0;
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			f2[i][j]=img2[k++];
+		}
+	}
+	normalize(f1,f1,1,0,NORM_MINMAX);
+	normalize(f2,f2,1,0	,NORM_MINMAX);
+
+	double sum = 0.0;
+	
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			double difference = (f1[i][j] - f2[i][j]);
+			sum = sum + difference*difference;
+		}
+	}
+	return sum /(32*32);
+}
 int main(int argc, char** argv) {
 
-	Mat_<FLT> f1(32,32),f2(32,32);
+	
 	vec_t out;
-	vec_t x;;
+	vec_t x,y;
 	
 	double media_a=0;
 	double media_v=0;
 	double media_q=0;
 	x.resize(1);
-	// x.resize(1);
-	// y.resize(1);
-	// nome.resize(1);
-	// int rot = 1;
-
+	
 	if(argc=!2){
 		cout<<"Argumentos incorretos\n"<< "Exemplo:  mse ../diretorio_com_imagens";
 	}
@@ -29,48 +58,46 @@ int main(int argc, char** argv) {
 	ARQCSV Q(location + "/valida.csv");
 
 	
-	x=A.tiny_x[0];
+	
 
 	network<sequential> net;
 	net.load("treina.net");
-	cout << "<<<<< validacao <<<<<<\n"<<A.nome[0]; 
-	printf("\noi1\n");
-	out = net.predict(x);
-	printf("oi2\n");
-
-	int k=0;
-	for (int i = 0; i < 32; i++)
+	
+	/*Treino*/
+	for (int i = 0; i < A.n; i++)
 	{
-		for (int j = 0; j < 32; j++)
-		{
-			f1[i][j]=out[k++];
-		}
-	}	
-	k=0;
-	for (int i = 0; i < 32; i++)
-	{
-		for (int j = 0; j < 32; j++)
-		{
-			f2[i][j]=A.tiny_y[0][k++];
-		}
+		x=A.tiny_x[i];
+		y=A.tiny_y[i];
+		out = net.predict(x);
+		media_a += calcula_mse(out,y);
 	}
-	normalize(f1,f1,1,-1,NORM_MINMAX);
-	normalize(f2,f2,1,-1,NORM_MINMAX);
+	media_a=media_a/A.n;
+	cout<<"Media de MSE de treino.csv: "<< media_a<<"\n";
+	
 
-	mostra(f1);
-	mostra(f2);
-	double sum = 0.0;
+	/*Teste*/
+	for (int i = 0; i < V.n; i++)
+	{
+		x=V.tiny_x[i];
+		y=V.tiny_y[i];
+		out = net.predict(x);
+		media_v += calcula_mse(out,y);
+	}
+	media_v=media_v/A.n;
+	cout<<"Media de MSE de treino.csv: "<< media_v<<"\n";
+
+
+	/*Validacao*/
+	for (int i = 0; i < V.n; i++)
+	{
+		x=Q.tiny_x[i];
+		y=Q.tiny_y[i];
+		out = net.predict(x);
+		media_q += calcula_mse(out,y);
+	}
+	media_q=media_q/A.n;
+	cout<<"Media de MSE de treino.csv: "<< media_q<<"\n";
 	
-		for(int y = 0; y < 32*32; ++y){
-			double difference = (out[y] - x[y]);
-			sum = sum + difference*difference;
-		}
-	
-	media_a = sum /(32*32);
-	
-	// media_a = net.get_loss<mse>(out, A.tiny_y);
-	// media_a=media_a/A.n;
-	cout<<"Media de MSE de treino.csv: "<< media_a;
 	
 
 }

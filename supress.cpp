@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   
   network<sequential> net;
   net.load("treina.net");
-  cout << "<<<<< validacao <<<<<<\n"; 
+  
   y[0] = net.predict(x[0]);
   int k=0;
   for (int i = 0; i < 32; i++)
@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
       f_res[i][j]=y[0][k++];
     }
   }
+  normalize(f,f,1,0,NORM_MINMAX);
+  mostra(f_res);
   imp(f_res,argv[2]);
 
 }

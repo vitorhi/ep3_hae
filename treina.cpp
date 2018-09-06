@@ -15,12 +15,12 @@ int main(int argc, char** argv) {
 	int n_train_epochs=300;
 	int n_minibatch=2;
 	network<sequential> net;
-	net << conv(8, 8, 2, 1, 40)
-	<< max_pool(7, 7, 40, 2) << relu()
-	// << conv(3, 3, 2, 40, 80)
+	net << conv(8, 8, 3, 1, 50)
+	<< max_pool(6, 6, 50, 2) << relu()
+	<< conv(3, 3, 2, 50, 80)
 	// << max_pool(2, 2, 80, 2) << relu()
-	<< fc(3*3*40, 200) << relu()
-	<< fc(200, 100) << relu()
+	<< fc(2*2*80, 400) << relu()
+	<< fc(400, 100) << relu()
 	<< fc(100, 32*32);
 
 // aumentaTreino(ax,ay,32,32,1,false,true); //espelha, diagonais
@@ -42,7 +42,7 @@ auto on_enumerate_epoch = [&]() {
 	// result res = net.test(V.tiny_x, V.tiny_y);
 	cout << "Validacao: " << loss << "/" /*<< res.num_total*/ << endl;
 	if (loss>=sucesso_anterior && optimizer.alpha>5e-6) {
-		optimizer.alpha *= 0.80;
+		optimizer.alpha *= 0.70;
 		cout << "Learning rate=" << optimizer.alpha << endl;
 	}
 	sucesso_anterior=loss;
